@@ -450,7 +450,7 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/musicHandlers.js",
-        "line": 647,
+        "line": 674,
         "kind": "event-send",
         "match": "event.sender.send(channel"
       }
@@ -545,7 +545,7 @@
     "dynamicSites": [
       {
         "file": "modules/ipc/terminalHandlers.js",
-        "line": 70,
+        "line": 79,
         "kind": "event-send",
         "match": "sender.send(channel"
       }
@@ -607,19 +607,19 @@
     "dynamicSites": [
       {
         "file": "modules/messageRenderer.js",
-        "line": 600,
+        "line": 683,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 2592,
+        "line": 2691,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       },
       {
         "file": "modules/messageRenderer.js",
-        "line": 3326,
+        "line": 3439,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -1123,7 +1123,7 @@
     "dynamicSites": [
       {
         "file": "modules/ui-system/settings/autosave.js",
-        "line": 187,
+        "line": 193,
         "kind": "custom-event-listener",
         "match": "target.addEventListener(type"
       }
@@ -1210,7 +1210,7 @@
     "dynamicSites": [
       {
         "file": "modules/ui-system/typed-field-owners.js",
-        "line": 440,
+        "line": 441,
         "kind": "custom-event-listener",
         "match": "form.addEventListener(type"
       }
@@ -1486,6 +1486,50 @@
     ],
     "evidence": [
       "Source review at upstream main d89cb793; exact operation matches below; new or changed dynamic sites still fail the contract gate."
+    ]
+  },
+  {
+    "id": "source.dynamic.modules.ipc.gamehandlers",
+    "kind": "source-review",
+    "owner": "modules/ipc/gameHandlers.js",
+    "status": "reviewed",
+    "dynamic": true,
+    "review": "Module-local vcp-game channel literals register table operations guarded by isTableSender and hall operations guarded by isHallSender. Table requests require the owned webContents and main frame; runtime readiness and operation failures are checked.",
+    "dynamicSites": [
+      {
+        "file": "modules/ipc/gameHandlers.js",
+        "line": 134,
+        "kind": "event-listener",
+        "match": "ipcMain.handle(channel"
+      },
+      {
+        "file": "modules/ipc/gameHandlers.js",
+        "line": 192,
+        "kind": "event-listener",
+        "match": "ipcMain.handle(channel"
+      }
+    ],
+    "evidence": [
+      "Source reviewed against upstream main 8f1562ea; fixed local registration calls and sender guards inspected."
+    ]
+  },
+  {
+    "id": "source.dynamic.modules.notificationrenderer.focus",
+    "kind": "source-review",
+    "owner": "modules/notificationRenderer.js",
+    "status": "reviewed",
+    "dynamic": true,
+    "review": "bindCollapseListener attaches module-local pointerdown, keydown and blur bindings. The lifecycle owner manages listeners when supplied; the fallback belongs to the window lifetime and initialization is guarded.",
+    "dynamicSites": [
+      {
+        "file": "modules/notificationRenderer.js",
+        "line": 1218,
+        "kind": "custom-event-listener",
+        "match": "target.addEventListener(type"
+      }
+    ],
+    "evidence": [
+      "Source reviewed against upstream main 8f1562ea; fixed local bindings and lifecycle ownership inspected."
     ]
   }
 ]

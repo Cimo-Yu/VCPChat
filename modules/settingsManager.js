@@ -1458,7 +1458,7 @@ const settingsManager = (() => {
                 });
             }
         },
-        displaySettingsForItem: displaySettingsForItem,
+        displaySettingsForItem: displaySettingsForItem, syncExternalAgentModel,
         populateAssistantAgentSelect: populateAssistantAgentSelect,
         // Expose for external use if needed, e.g., in the save function
         completeVcpUrl: completeVcpUrl,
@@ -2569,6 +2569,22 @@ function resolveRegexSlots() {
     /**
      * 应用名片CSS到设置页面的Agent身份容器
      */
+    function syncExternalAgentModel(agentId, modelId) {
+        if (!agentId || typeof modelId !== 'string') return;
+        const draft = unsavedAgentDrafts.get(agentId);
+        if (draft && typeof draft === 'object') {
+            draft.model = modelId;
+        }
+        refreshAgentControls();
+        if (editingAgentIdInput && editingAgentIdInput.value === agentId) {
+            const input = getAgentControl('agentModel') || agentModelInput;
+            if (input && input.value !== modelId) {
+                input.value = modelId;
+            }
+            void updateSectionSummary('model');
+        }
+    }
+
     function applyCardCssToIdentityContainer(cardCss) {
         const agentHost = window.VCPSettingsSidebar?.getView?.('agent') || document.getElementById('agentSettingsContainer');
         const identityContainer = agentHost?.querySelector?.('.agent-identity-container') || document.querySelector('#agentSettingsContainer .agent-identity-container');

@@ -1429,17 +1429,31 @@ window.itemListManager = (() => {
             return false;
         }
 
-        const matchedItem = loadedItemsCache.find(item => item.id === itemId && item.type === itemType);
-        if (!matchedItem) {
-            return false;
-        }
-
-        matchedItem.config = {
-            ...(matchedItem.config || {}),
-            ...partialConfig
+        const applyPatch = (target) => {
+            if (!target || typeof target !== 'object') return;
+            Object.assign(target, partialConfig);
+            if (target.config && typeof target.config === 'object') {
+                target.config = {
+                    ...target.config,
+                    ...partialConfig
+                };
+            }
         };
 
-        return true;
+        const matchedItem = loadedItemsCache.find(item => item.id === itemId && item.type === itemType);
+        if (matchedItem) {
+            applyPatch(matchedItem);
+        }
+
+        if (itemListUl) {
+            const li = Array.from(itemListUl.querySelectorAll('li[data-item-id][data-item-type]'))
+                .find(candidate => candidate.dataset.itemId === itemId && candidate.dataset.itemType === itemType);
+            if (li?._itemData) {
+                applyPatch(li._itemData);
+            }
+        }
+
+        return Boolean(matchedItem);
     }
 
     // --- Public API ---

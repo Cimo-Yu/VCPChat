@@ -92,9 +92,14 @@
                             if (latest.config) next.config = { ...latest.config, model: modelId };
                             selectedItemRef.set(next);
                         }
-                        const settingsInput = document.getElementById('agentModel');
-                        if (settingsInput && document.getElementById('editingAgentId')?.value === agentId) {
-                            settingsInput.value = modelId;
+                        window.itemListManager?.updateLoadedItemConfig?.(agentId, 'agent', { model: modelId });
+                        if (window.settingsManager?.syncExternalAgentModel) {
+                            window.settingsManager.syncExternalAgentModel(agentId, modelId);
+                        } else {
+                            const settingsInput = document.getElementById('agentModel');
+                            if (settingsInput && document.getElementById('editingAgentId')?.value === agentId) {
+                                settingsInput.value = modelId;
+                            }
                         }
                     } catch (error) {
                         console.error('[ComposerModelSelect] 切换模型失败:', error);

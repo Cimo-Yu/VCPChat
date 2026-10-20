@@ -109,7 +109,7 @@ async function withAgentSettings(run) {
         };
         const state = () => document.getElementById('formSaveStateIndicator').dataset.state;
         const value = id => form.querySelector(`#${id}`).value;
-        await run({ show, edit, save, state, value, toasts, disk, setSaveFails: v => { saveFails = v; } });
+        await run({ show, edit, save, state, value, toasts, disk, syncModel: (id, model) => sm.syncExternalAgentModel(id, model), setSaveFails: v => { saveFails = v; } });
     } finally {
         intervals.forEach(clearInterval);
         Object.assign(globalThis, saved);
@@ -196,4 +196,19 @@ test('local tool choices survive draft switching, save, reload and return to inh
     await save();
     assert.equal(disk['agent-a'].toolPresentation, 'inherit');
     assert.equal(disk['agent-a'].toolExpansion, 'inherit');
+}));
+
+test('external saved model replaces the retained model without losing other draft edits', () => withAgentSettings(async ({ show, edit, save, value, disk, syncModel }) => {
+    disk['agent-a'].model = 'old-model';
+    await show('agent-a');
+    edit('agentCustomCss', '.keep-draft {}');
+    await show('agent-b');
+    disk['agent-a'].model = 'new-model';
+    syncModel('agent-a', 'new-model');
+    await show('agent-a');
+    assert.equal(value('agentModel'), 'new-model');
+    assert.equal(value('agentCustomCss'), '.keep-draft {}');
+    await save();
+    assert.equal(disk['agent-a'].model, 'new-model');
+    assert.equal(disk['agent-a'].customCss, '.keep-draft {}');
 }));

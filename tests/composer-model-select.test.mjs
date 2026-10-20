@@ -337,3 +337,24 @@ test('ComposerModelSelect: dispose之后保存完成不得回写选中项和设�
     assert.equal(h.current.config.model, 'model-a');
     assert.equal(h.document.getElementById('agentModel').value, '');
 });
+test('ComposerModelSelect: 保存成功后同步itemListManager缓存与settingsManager外部模型状态，防止切换回退', async t => {
+    const h = setupDelayedSwitch(t);
+    const listUpdates = [];
+    const syncedModels = [];
+    h.document.defaultView.itemListManager = {
+        updateLoadedItemConfig: (id, type, patch) => listUpdates.push({ id, type, patch })
+    };
+    h.document.defaultView.settingsManager = {
+        syncExternalAgentModel: (id, model) => syncedModels.push({ id, model })
+    };
+
+    h.select('model-pro');
+    h.calls[0].resolve({ success: true });
+    await h.flush();
+
+    assert.equal(listUpdates.length, 1);
+    assert.equal(listUpdates[0].id, 'agent_1');
+    assert.equal(listUpdates[0].type, 'agent');
+    assert.equal(listUpdates[0].patch.model, 'model-pro');
+    assert.deepEqual(syncedModels, [{ id: 'agent_1', model: 'model-pro' }]);
+});
